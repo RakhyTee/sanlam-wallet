@@ -4,7 +4,7 @@ using Wallet.Domain.Wallets;
 
 namespace Wallet.Infrastructure.Persistence.Configurations;
 
-public sealed class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
+public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 {
     public void Configure(EntityTypeBuilder<Transaction> builder)
     {

@@ -9,7 +9,7 @@ namespace Wallet.Infrastructure.Events;
 //WalletRepository.SaveAsync has already committed. A crash between those two
 //calls loses the event row, never the withdrawal itself. Chosen deliberately
 //over a same-transaction (outbox-style) write to keep this minimal.
-public sealed class DbEventPublisher : IEventPublisher
+public class DbEventPublisher : IEventPublisher
 {
     private const string FundsWithdrawnEventType = "FundsWithdrawn";
     private const int EventSchemaVersion = 1;

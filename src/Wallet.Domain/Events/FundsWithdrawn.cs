@@ -1,6 +1,6 @@
 namespace Wallet.Domain.Events;
 
-public sealed class FundsWithdrawn
+public class FundsWithdrawn
 {
     public Guid EventId { get; set; }
     public Guid WalletId { get; set; }

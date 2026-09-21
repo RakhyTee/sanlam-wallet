@@ -4,7 +4,7 @@ using Wallet.Domain.Events;
 
 namespace Wallet.Infrastructure.Persistence.Configurations;
 
-public sealed class EventEnvelopeConfiguration : IEntityTypeConfiguration<EventEnvelope>
+public class EventEnvelopeConfiguration : IEntityTypeConfiguration<EventEnvelope>
 {
     public void Configure(EntityTypeBuilder<EventEnvelope> builder)
     {

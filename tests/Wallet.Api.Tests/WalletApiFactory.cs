@@ -7,7 +7,7 @@ using Wallet.Infrastructure.Persistence;
 
 namespace Wallet.Api.Tests;
 
-public sealed class WalletApiFactory : WebApplicationFactory<Program>
+public class WalletApiFactory : WebApplicationFactory<Program>
 {
     public string DbPath { get; } = Path.Combine(Path.GetTempPath(), $"wallet-tests-{Guid.NewGuid():N}.db");
 

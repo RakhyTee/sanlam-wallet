@@ -7,7 +7,7 @@ using DomainWallet = Wallet.Domain.Wallets.Wallet;
 
 namespace Wallet.Infrastructure.Repositories;
 
-public sealed class WalletRepository : IWalletRepository
+public class WalletRepository : IWalletRepository
 {
     private const int SqliteConstraintErrorCode = 19;
 

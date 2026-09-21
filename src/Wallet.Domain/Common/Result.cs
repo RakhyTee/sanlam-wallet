@@ -15,7 +15,7 @@ public class Result
     public static Result<T> Fail<T>(Error error) => new() { IsSuccess = false, Error = error };
 }
 
-public sealed class Result<T> : Result
+public class Result<T> : Result
 {
     public T? Value { get; set; }
 }

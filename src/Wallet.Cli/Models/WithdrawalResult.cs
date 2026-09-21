@@ -1,6 +1,6 @@
 namespace Wallet.Cli.Models;
 
-public sealed class WithdrawalResult
+public class WithdrawalResult
 {
     public Guid WithdrawalId { get; set; }
     public Guid WalletId { get; set; }

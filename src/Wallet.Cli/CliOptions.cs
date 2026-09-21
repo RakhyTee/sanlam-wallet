@@ -1,6 +1,6 @@
 namespace Wallet.Cli;
 
-public sealed class CliOptions
+public class CliOptions
 {
-    public string BaseUrl { get; set; } = "https://localhost:5001";
+    public string BaseUrl { get; set; } = "http://localhost:5126";
 }

@@ -3,7 +3,7 @@ using Wallet.Cli.Models;
 
 namespace Wallet.Cli.Commands;
 
-public sealed class WithdrawCommand : Command
+public class WithdrawCommand : Command
 {
     private readonly WalletApiClient _client;
 

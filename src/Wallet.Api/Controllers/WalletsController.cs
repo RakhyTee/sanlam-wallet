@@ -11,7 +11,7 @@ namespace Wallet.Api.Controllers;
 
 [ApiController]
 [Route("api/wallets")]
-public sealed class WalletsController : ControllerBase
+public class WalletsController : ControllerBase
 {
     private const string IdempotencyKeyHeader = "Idempotency-Key";
 

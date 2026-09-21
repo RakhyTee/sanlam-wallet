@@ -1,6 +1,6 @@
 namespace Wallet.Api.Middleware;
 
-public sealed class CorrelationIdMiddleware
+public class CorrelationIdMiddleware
 {
     private const string HeaderName = "X-Correlation-Id";
 

@@ -1,6 +1,6 @@
 namespace Wallet.Domain.Wallets;
 
-public sealed class Money
+public class Money
 {
     public decimal Amount { get; }
     public string Currency { get; }

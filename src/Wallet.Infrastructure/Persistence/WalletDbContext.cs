@@ -5,7 +5,7 @@ using DomainWallet = Wallet.Domain.Wallets.Wallet;
 
 namespace Wallet.Infrastructure.Persistence;
 
-public sealed class WalletDbContext : DbContext
+public class WalletDbContext : DbContext
 {
     public DbSet<DomainWallet> Wallets => Set<DomainWallet>();
     public DbSet<Transaction> Transactions => Set<Transaction>();

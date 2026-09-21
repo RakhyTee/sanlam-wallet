@@ -1,6 +1,6 @@
 namespace Wallet.Cli.Models;
 
-public sealed class BalanceResult
+public class BalanceResult
 {
     public Guid WalletId { get; set; }
     public decimal Balance { get; set; }

@@ -5,7 +5,7 @@ using DomainWallet = Wallet.Domain.Wallets.Wallet;
 
 namespace Wallet.Infrastructure.Persistence;
 
-public sealed class WalletSeeder
+public class WalletSeeder
 {
     public static readonly Guid SeedWalletId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private const decimal SeedBalance = 1000.00m;

@@ -4,7 +4,7 @@ using DomainWallet = Wallet.Domain.Wallets.Wallet;
 
 namespace Wallet.Infrastructure.Persistence.Configurations;
 
-public sealed class WalletConfiguration : IEntityTypeConfiguration<DomainWallet>
+public class WalletConfiguration : IEntityTypeConfiguration<DomainWallet>
 {
     public void Configure(EntityTypeBuilder<DomainWallet> builder)
     {

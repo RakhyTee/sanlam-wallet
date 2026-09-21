@@ -1,6 +1,6 @@
 namespace Wallet.Api.Models.Responses;
 
-public sealed class WithdrawalResponse
+public class WithdrawalResponse
 {
     public Guid WithdrawalId { get; set; }
     public Guid WalletId { get; set; }

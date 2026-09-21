@@ -3,7 +3,7 @@ using Wallet.Cli.Models;
 
 namespace Wallet.Cli;
 
-public sealed class WalletApiClient
+public class WalletApiClient
 {
     private readonly HttpClient _httpClient;
 

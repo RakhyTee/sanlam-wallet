@@ -3,7 +3,7 @@ using Wallet.Cli.Models;
 
 namespace Wallet.Cli.Commands;
 
-public sealed class BalanceCommand : Command
+public class BalanceCommand : Command
 {
     private readonly WalletApiClient _client;
 
