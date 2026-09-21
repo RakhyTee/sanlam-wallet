@@ -1,4 +1,4 @@
-﻿namespace Wallet.Domain.Events;
+namespace Wallet.Domain.Events;
 
 public sealed class FundsWithdrawn
 {
@@ -8,5 +8,5 @@ public sealed class FundsWithdrawn
     public decimal Amount { get; set; }
     public string Currency { get; set; } = string.Empty;
     public decimal BalanceAfter { get; set; }
-    public DateTime OccurredAtUtc { get; set; }
+    public DateTime RequestedAt { get; set; }
 }

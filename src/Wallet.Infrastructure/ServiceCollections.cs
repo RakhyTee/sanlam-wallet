@@ -1,13 +1,9 @@
-using System.Threading.Channels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Wallet.Application;
 using Wallet.Application.Abstractions;
-using Wallet.Domain.Events;
 using Wallet.Infrastructure.Events;
-using Wallet.Infrastructure.Outbox;
 using Wallet.Infrastructure.Persistence;
 using Wallet.Infrastructure.Repositories;
 
@@ -24,13 +20,7 @@ public static class ServiceCollections
 
         services.AddScoped<IWalletRepository, WalletRepository>();
         services.AddScoped<WalletSeeder>();
-
-        services.AddSingleton(Channel.CreateUnbounded<EventEnvelope>());
-        services.AddSingleton<IEventPublisher, InProcessEventPublisher>();
-
-        services.Configure<OutboxOptions>(configuration.GetSection(OutboxOptions.SectionName));
-        services.AddHostedService<LoggingEventConsumer>();
-        services.AddHostedService<OutboxDispatcher>();
+        services.AddScoped<IEventPublisher, DbEventPublisher>();
 
         services.AddSingleton(TimeProvider.System);
 

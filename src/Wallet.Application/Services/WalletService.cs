@@ -1,8 +1,7 @@
-﻿using System.Text.Json;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Wallet.Application.Abstractions;
 using Wallet.Application.Mappers;
 using Wallet.Application.Models;
-using Wallet.Domain;
 using Wallet.Domain.Common;
 using Wallet.Domain.Enums;
 using Wallet.Domain.Events;
@@ -13,17 +12,17 @@ namespace Wallet.Application.Services;
 public class WalletService : IWalletService
 {
     private const int MaxAttempts = 2;
-    private const string FundsWithdrawnEventType = "FundsWithdrawn";
-    private const int EventSchemaVersion = 1;
 
     private readonly IWalletRepository _repository;
+    private readonly IEventPublisher _eventPublisher;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<WalletService> _logger;
 
-    public WalletService(IWalletRepository repository, TimeProvider timeProvider,
+    public WalletService(IWalletRepository repository, IEventPublisher eventPublisher, TimeProvider timeProvider,
             ILogger<WalletService> logger)
     {
         _repository = repository;
+        _eventPublisher = eventPublisher;
         _timeProvider = timeProvider;
         _logger = logger;
     }
@@ -40,7 +39,7 @@ public class WalletService : IWalletService
             WalletId = wallet.Id,
             Balance = wallet.Balance.Amount,
             Currency = wallet.Balance.Currency,
-            AsOfUtc = _timeProvider.GetUtcNow().UtcDateTime
+            AsOf = _timeProvider.GetUtcNow().UtcDateTime
         });
     }
 
@@ -62,7 +61,7 @@ public class WalletService : IWalletService
             if (withdrawResult.IsFailure)
                 return Result.Fail<WithdrawalDto>(withdrawResult.Error!);
 
-            var occurredAtUtc = _timeProvider.GetUtcNow().UtcDateTime;
+            var requestedAt = _timeProvider.GetUtcNow().UtcDateTime;
 
             var transaction = new Domain.Wallets.Transaction
             {
@@ -72,23 +71,35 @@ public class WalletService : IWalletService
                 Amount = amount,
                 BalanceAfter = wallet.Balance.Amount,
                 IdempotencyKey = idempotencyKey,
-                CreatedAtUtc = occurredAtUtc
+                CreatedAt = requestedAt
             };
-
-            var outboxMessage = BuildOutboxMessage(wallet.Id, transaction, amount, wallet.Balance.Currency, occurredAtUtc);
 
             try
             {
-                await _repository.SaveAsync(wallet, transaction, outboxMessage, cancellationToken);
+                await _repository.SaveAsync(wallet, transaction, cancellationToken);
 
                 _logger.LogInformation(
                     "Withdrawal {WithdrawalId} succeeded for wallet {WalletId}, balance now {Balance}",
                     transaction.Id, wallet.Id, wallet.Balance.Amount);
 
+                await _eventPublisher.PublishAsync(new FundsWithdrawn
+                {
+                    EventId = Guid.NewGuid(),
+                    WalletId = wallet.Id,
+                    WithdrawalId = transaction.Id,
+                    Amount = amount,
+                    Currency = wallet.Balance.Currency,
+                    BalanceAfter = transaction.BalanceAfter,
+                    RequestedAt = requestedAt
+                }, cancellationToken);
+
                 return Result.Ok(WalletMapper.ToWithdrawalDto(transaction));
             }
-            catch (ConcurrencyConflictException) when (attempt < MaxAttempts)
+            catch (ConcurrencyConflictException)
             {
+                if (attempt >= MaxAttempts)
+                    return Result.Fail<WithdrawalDto>(WalletErrors.ConcurrencyConflict);
+
                 _logger.LogWarning("Concurrency conflict on wallet {WalletId}, retrying", walletId);
             }
             catch (DuplicateWithdrawalException)
@@ -103,37 +114,4 @@ public class WalletService : IWalletService
 
         return Result.Fail<WithdrawalDto>(WalletErrors.ConcurrencyConflict);
     }
-
-    private static OutboxMessage BuildOutboxMessage(
-        Guid walletId, Domain.Wallets.Transaction transaction, decimal amount, string currency, DateTime occurredAtUtc)
-    {
-        var domainEvent = new FundsWithdrawn
-        {
-            EventId = Guid.NewGuid(),
-            WalletId = walletId,
-            WithdrawalId = transaction.Id,
-            Amount = amount,
-            Currency = currency,
-            BalanceAfter = transaction.BalanceAfter,
-            OccurredAtUtc = occurredAtUtc
-        };
-
-        var envelope = new EventEnvelope
-        {
-            EventId = domainEvent.EventId,
-            EventType = FundsWithdrawnEventType,
-            Version = EventSchemaVersion,
-            OccurredAtUtc = occurredAtUtc,
-            Payload = JsonSerializer.Serialize(domainEvent)
-        };
-
-        return new OutboxMessage
-        {
-            Id = Guid.NewGuid(),
-            Type = FundsWithdrawnEventType,
-            Payload = JsonSerializer.Serialize(envelope),
-            OccurredAtUtc = occurredAtUtc
-        };
-    }
-
 }

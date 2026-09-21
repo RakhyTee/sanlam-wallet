@@ -11,7 +11,7 @@ using Wallet.Infrastructure.Persistence;
 namespace Wallet.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    [Migration("20260921014416_InitialCreate")]
+    [Migration("20260921074636_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,40 +20,30 @@ namespace Wallet.Infrastructure.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.12");
 
-            modelBuilder.Entity("Wallet.Domain.OutboxMessage", b =>
+            modelBuilder.Entity("Wallet.Domain.Events.EventEnvelope", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("EventId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Attempts")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("LastError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("OccurredAtUtc")
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Payload")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("ProcessedAtUtc")
+                    b.Property<DateTime>("RequestedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("Id");
+                    b.HasKey("EventId");
 
-                    b.HasIndex("ProcessedAtUtc")
-                        .HasFilter("\"ProcessedAtUtc\" IS NULL");
-
-                    b.ToTable("OutboxMessages", (string)null);
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("Wallet.Domain.Wallets.Transaction", b =>
@@ -68,7 +58,7 @@ namespace Wallet.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("BalanceAfter")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CreatedAtUtc")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IdempotencyKey")

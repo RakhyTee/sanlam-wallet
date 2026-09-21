@@ -1,7 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Wallet.Application;
-using Wallet.Domain;
 using Wallet.Domain.Wallets;
 using Wallet.Infrastructure.Persistence;
 using DomainWallet = Wallet.Domain.Wallets.Wallet;
@@ -33,10 +32,9 @@ public sealed class WalletRepository : IWalletRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.WalletId == walletId && t.IdempotencyKey == idempotencyKey, cancellationToken);
 
-    public async Task SaveAsync(DomainWallet wallet, Transaction transaction, OutboxMessage outboxMessage, CancellationToken cancellationToken = default)
+    public async Task SaveAsync(DomainWallet wallet, Transaction transaction, CancellationToken cancellationToken = default)
     {
         _context.Transactions.Add(transaction);
-        _context.OutboxMessages.Add(outboxMessage);
 
         await using var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 

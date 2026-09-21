@@ -10,6 +10,6 @@ public class Transaction
     public decimal Amount { get; set; }
     public decimal BalanceAfter { get; set; }
     public string? IdempotencyKey { get; set; }
-    public DateTime CreatedAtUtc { get; set; }
+    public DateTime CreatedAt { get; set; }
 
 }

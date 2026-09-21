@@ -12,20 +12,18 @@ namespace Wallet.Infrastructure.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "OutboxMessages",
+                name: "Events",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Type = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Payload = table.Column<string>(type: "TEXT", nullable: false),
-                    OccurredAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ProcessedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Attempts = table.Column<int>(type: "INTEGER", nullable: false),
-                    LastError = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true)
+                    EventId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    EventType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Version = table.Column<int>(type: "INTEGER", nullable: false),
+                    RequestedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Payload = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OutboxMessages", x => x.Id);
+                    table.PrimaryKey("PK_Events", x => x.EventId);
                 });
 
             migrationBuilder.CreateTable(
@@ -38,7 +36,7 @@ namespace Wallet.Infrastructure.Persistence.Migrations
                     Amount = table.Column<decimal>(type: "TEXT", nullable: false),
                     BalanceAfter = table.Column<decimal>(type: "TEXT", nullable: false),
                     IdempotencyKey = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    CreatedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -61,12 +59,6 @@ namespace Wallet.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutboxMessages_ProcessedAtUtc",
-                table: "OutboxMessages",
-                column: "ProcessedAtUtc",
-                filter: "\"ProcessedAtUtc\" IS NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_WalletId_IdempotencyKey",
                 table: "Transactions",
                 columns: new[] { "WalletId", "IdempotencyKey" },
@@ -78,7 +70,7 @@ namespace Wallet.Infrastructure.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OutboxMessages");
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "Transactions");

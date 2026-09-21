@@ -31,6 +31,6 @@ public sealed class BalanceCommand : Command
             return;
         }
 
-        Console.WriteLine($"Wallet {balance.WalletId}: {balance.Balance:F2} {balance.Currency} (as of {balance.AsOfUtc:O})");
+        Console.WriteLine($"Wallet {balance.WalletId}: {balance.Balance:F2} {balance.Currency} (as of {balance.AsOf:O})");
     }
 }

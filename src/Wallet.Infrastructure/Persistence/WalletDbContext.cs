@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Wallet.Domain;
+using Wallet.Domain.Events;
 using Wallet.Domain.Wallets;
 using DomainWallet = Wallet.Domain.Wallets.Wallet;
 
@@ -9,7 +9,7 @@ public sealed class WalletDbContext : DbContext
 {
     public DbSet<DomainWallet> Wallets => Set<DomainWallet>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
-    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+    public DbSet<EventEnvelope> Events => Set<EventEnvelope>();
 
     public WalletDbContext(DbContextOptions<WalletDbContext> options) : base(options)
     {

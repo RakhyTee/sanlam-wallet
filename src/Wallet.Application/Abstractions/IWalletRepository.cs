@@ -1,5 +1,4 @@
-﻿using Wallet.Domain;
-using Wallet.Domain.Wallets;
+﻿using Wallet.Domain.Wallets;
 using DomainWallet = Wallet.Domain.Wallets.Wallet;
 
 namespace Wallet.Application;
@@ -12,6 +11,6 @@ public interface IWalletRepository
 
     Task<Transaction?> GetByIdempotencyKeyAsync(Guid walletId, string idempotencyKey, CancellationToken cancellationToken = default);
 
-    Task SaveAsync(DomainWallet wallet, Transaction transaction, OutboxMessage outboxMessage, CancellationToken cancellationToken = default);
+    Task SaveAsync(DomainWallet wallet, Transaction transaction, CancellationToken cancellationToken = default);
 
 }

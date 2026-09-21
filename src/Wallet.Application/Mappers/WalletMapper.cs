@@ -10,14 +10,14 @@ public static class WalletMapper
         WalletId = transaction.WalletId,
         Amount = transaction.Amount,
         BalanceAfter = transaction.BalanceAfter,
-        RequestedAt = transaction.CreatedAtUtc
+        RequestedAt = transaction.CreatedAt
     };
 
-    public static BalanceDto ToBalanceDto(Domain.Wallets.Wallet wallet, DateTime asOfUtc) => new()
+    public static BalanceDto ToBalanceDto(Domain.Wallets.Wallet wallet, DateTime asOf) => new()
     {
         WalletId = wallet.Id,
         Balance = wallet.Balance.Amount,
         Currency = wallet.Balance.Currency,
-        AsOfUtc = asOfUtc
+        AsOf = asOf
     };
 }

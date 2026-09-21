@@ -10,7 +10,7 @@ public static class WalletResponseMapper
         WalletId = dto.WalletId,
         Balance = dto.Balance,
         Currency = dto.Currency,
-        AsOfUtc = dto.AsOfUtc
+        AsOf = dto.AsOf
     };
 
     public static WithdrawalResponse ToResponse(WithdrawalDto dto) => new()
