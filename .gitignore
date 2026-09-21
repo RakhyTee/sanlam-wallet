@@ -1,0 +1,23 @@
+## .NET
+bin/
+obj/
+out/
+
+## Rider / VS / VS Code
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+## Test results
+[Tt]est[Rr]esult*/
+*.trx
+
+## SQLite runtime files (created by WalletSeeder, not committed)
+*.db
+*.db-shm
+*.db-wal
+
+## OS
+.DS_Store
