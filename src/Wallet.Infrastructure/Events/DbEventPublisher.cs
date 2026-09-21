@@ -5,6 +5,10 @@ using Wallet.Infrastructure.Persistence;
 
 namespace Wallet.Infrastructure.Events;
 
+//Best-effort, not atomic with the withdrawal: WalletService calls this after
+//WalletRepository.SaveAsync has already committed. A crash between those two
+//calls loses the event row, never the withdrawal itself. Chosen deliberately
+//over a same-transaction (outbox-style) write to keep this minimal.
 public sealed class DbEventPublisher : IEventPublisher
 {
     private const string FundsWithdrawnEventType = "FundsWithdrawn";

@@ -21,6 +21,9 @@ public class Wallet
 
     public Result Withdraw(decimal amount)
     {
+        if (amount <= 0)
+            return Result.Fail(WalletErrors.InvalidAmount);
+
         if (Balance.Amount < amount)
             return Result.Fail(WalletErrors.InsufficientFunds);
 

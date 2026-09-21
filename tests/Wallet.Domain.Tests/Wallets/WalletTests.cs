@@ -42,6 +42,21 @@ public class WalletTests
         Assert.Equal(0, wallet.Version);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-100)]
+    public void Withdraw_NonPositiveAmount_ReturnsInvalidAmountAndDoesNotMutate(decimal amount)
+    {
+        var wallet = new DomainWallet(Guid.NewGuid(), new Money(1000m, "ZAR"));
+
+        var result = wallet.Withdraw(amount);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(WalletErrors.InvalidAmount.Code, result.Error!.Code);
+        Assert.Equal(1000m, wallet.Balance.Amount);
+        Assert.Equal(0, wallet.Version);
+    }
+
     [Fact]
     public void Withdraw_MultipleSuccessiveWithdrawals_AccumulatesVersion()
     {

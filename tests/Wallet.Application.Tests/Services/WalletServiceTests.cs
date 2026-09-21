@@ -3,6 +3,7 @@ using Microsoft.Extensions.Time.Testing;
 using NSubstitute;
 using Wallet.Application.Abstractions;
 using Wallet.Application.Services;
+using Wallet.Domain.Events;
 using Wallet.Domain.Wallets;
 using DomainWallet = Wallet.Domain.Wallets.Wallet;
 
@@ -10,8 +11,8 @@ namespace Wallet.Application.Tests.Services;
 
 public class WalletServiceTests
 {
-    private static WalletService CreateSut(IWalletRepository repository, TimeProvider? timeProvider = null) =>
-        new(repository, Substitute.For<IEventPublisher>(), timeProvider ?? new FakeTimeProvider(), Substitute.For<ILogger<WalletService>>());
+    private static WalletService CreateSut(IWalletRepository repository, IEventPublisher? eventPublisher = null, TimeProvider? timeProvider = null) =>
+        new(repository, eventPublisher ?? Substitute.For<IEventPublisher>(), timeProvider ?? new FakeTimeProvider(), Substitute.For<ILogger<WalletService>>());
 
     [Fact]
     public async Task WithdrawAsync_WalletNotFound_ReturnsNotFoundError()
@@ -85,6 +86,44 @@ public class WalletServiceTests
             Arg.Is<DomainWallet>(w => w.Id == walletId),
             Arg.Is<Transaction>(t => t.WalletId == walletId && t.Amount == 400m),
             Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task WithdrawAsync_Success_PublishesFundsWithdrawnEvent()
+    {
+        var walletId = Guid.NewGuid();
+        var wallet = new DomainWallet(walletId, new Money(1000m, "ZAR"));
+
+        var repository = Substitute.For<IWalletRepository>();
+        repository.GetForUpdateAsync(walletId, Arg.Any<CancellationToken>()).Returns(wallet);
+        repository.GetByIdempotencyKeyAsync(walletId, Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((Transaction?)null);
+
+        var eventPublisher = Substitute.For<IEventPublisher>();
+        var sut = CreateSut(repository, eventPublisher: eventPublisher);
+
+        await sut.WithdrawAsync(walletId, 400m, "key-1");
+
+        await eventPublisher.Received(1).PublishAsync(
+            Arg.Is<FundsWithdrawn>(e => e.WalletId == walletId && e.Amount == 400m && e.BalanceAfter == 600m),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task WithdrawAsync_InsufficientFunds_DoesNotPublishEvent()
+    {
+        var walletId = Guid.NewGuid();
+        var wallet = new DomainWallet(walletId, new Money(100m, "ZAR"));
+
+        var repository = Substitute.For<IWalletRepository>();
+        repository.GetForUpdateAsync(walletId, Arg.Any<CancellationToken>()).Returns(wallet);
+        repository.GetByIdempotencyKeyAsync(walletId, Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((Transaction?)null);
+
+        var eventPublisher = Substitute.For<IEventPublisher>();
+        var sut = CreateSut(repository, eventPublisher: eventPublisher);
+
+        await sut.WithdrawAsync(walletId, 500m, "key-1");
+
+        await eventPublisher.DidNotReceive().PublishAsync(Arg.Any<FundsWithdrawn>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -226,7 +265,7 @@ public class WalletServiceTests
         var repository = Substitute.For<IWalletRepository>();
         repository.GetByIdAsync(walletId, Arg.Any<CancellationToken>()).Returns(wallet);
 
-        var sut = CreateSut(repository, new FakeTimeProvider(now));
+        var sut = CreateSut(repository, timeProvider: new FakeTimeProvider(now));
 
         var result = await sut.GetBalanceAsync(walletId);
 
