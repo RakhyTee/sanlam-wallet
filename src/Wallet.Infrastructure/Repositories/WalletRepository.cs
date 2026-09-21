@@ -45,10 +45,16 @@ public class WalletRepository : IWalletRepository
         }
         catch (DbUpdateConcurrencyException ex)
         {
+            //Detach the stale wallet and the failed transaction so a caller's retry (same
+            //DbContext) gets a genuinely fresh read instead of EF's identity map handing back
+            //this already-mutated instance, and doesn't resubmit this Transaction alongside a
+            //new one on the same idempotency key.
+            _context.ChangeTracker.Clear();
             throw new ConcurrencyConflictException($"Wallet {wallet.Id} was updated concurrently.", ex);
         }
         catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
         {
+            _context.ChangeTracker.Clear();
             throw new DuplicateWithdrawalException(
                 $"Withdrawal with idempotency key '{transaction.IdempotencyKey}' was already processed for wallet {wallet.Id}.", ex);
         }
